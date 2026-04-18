@@ -571,14 +571,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('close-success-btn').addEventListener('click', closeSuccessModal);
 
-    document.getElementById('checkout-form').addEventListener('submit', (e) => {
+    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        const emailInput = document.getElementById('checkout-email').value;
+        if (!emailInput) return;
 
         // Mock payment processing
         const btn = document.querySelector('#checkout-form button[type="submit"]');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
         btn.disabled = true;
+
+        // Generate a mock eSIM profile and QR code
+        const mockEsimId = Math.random().toString(36).substring(2, 10);
+        const mockEsimString = `LPA:1$esim.test$${mockEsimId}`;
+        const qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(mockEsimString)}`;
+
+        try {
+            // Send email using Brevo API
+            // SECURITY WARNING: Do not put your Brevo API key directly in client-side code!
+            // Doing so allows anyone to steal your key and send spam from your account.
+            // Because this is a static site on GitHub Pages, you must create a small backend
+            // (like a Cloudflare Worker, Netlify Function, or a simple Node.js/Python server)
+            // that holds your API key securely. The frontend should call your secure server,
+            // which then calls Brevo.
+            //
+            // Example of what the frontend call to your secure backend should look like:
+            // const response = await fetch('https://your-secure-backend.com/send-email', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ email: emailInput, qrUrl: qrUrl })
+            // });
+
+            console.log("Mocking email send to:", emailInput, "with QR:", qrUrl);
+            console.log("To make this live, deploy the provided Python script to a backend server.");
+
+            // To simulate the network delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+        } catch (err) {
+            console.error("Failed to send email:", err);
+        }
 
         setTimeout(() => {
             // Reset state

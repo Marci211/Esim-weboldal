@@ -429,7 +429,7 @@ function showPackagesForLocation(locationName) {
                     <li class="flex items-start"><i class="fas fa-network-wired text-blue-500 mt-1 mr-2"></i> Networks: ${pkg.speed || '4G/5G'}</li>
                     ${pkg.fupPolicy ? `<li class="flex items-start"><i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i> FUP: ${pkg.fupPolicy}</li>` : ''}
                 </ul>
-                <button class="add-to-cart-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors" data-pkg='${JSON.stringify({id: pkg.packageCode, name: pkg.name, price: sellingPriceHUF, location: locationName, volume: dataVolume, duration: durationText})}'>
+                <button class="add-to-cart-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors" data-pkg='${JSON.stringify({id: pkg.packageCode, name: pkg.name, price: sellingPriceHUF, location: locationName, volume: dataVolume, duration: durationText}).replace(/'/g, "&apos;")}'>
                     ${t('add-to-cart')}
                 </button>
             </div>
@@ -448,7 +448,7 @@ function attachCartListeners() {
     const btns = document.querySelectorAll('.add-to-cart-btn');
     btns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const pkgData = JSON.parse(e.target.getAttribute('data-pkg'));
+            const pkgData = JSON.parse(e.currentTarget.getAttribute('data-pkg'));
             addToCart(pkgData);
         });
     });
@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('checkout-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const emailInput = document.getElementById('checkout-email').value;
+        const emailInput = document.getElementById('email').value;
         if (!emailInput) return;
 
         // Mock payment processing

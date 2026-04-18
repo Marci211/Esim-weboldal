@@ -1,0 +1,38 @@
+name: Update eSIM Packages
+
+on:
+  schedule:
+    # Run every day at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Allow manual triggering from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  update-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Fetch and update packages
+        env:
+          # Use a secret for the API key to keep it secure
+          # IMPORTANT: User needs to add ESIM_API_KEY to their repository secrets
+          ESIM_API_KEY: ${{ secrets.ESIM_API_KEY }}
+        run: python scripts/update_packages.py
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add packages.json
+          # Only commit if there are changes
+          git diff-index --quiet HEAD || (git commit -m "chore: automated update of eSIM packages data" && git push)

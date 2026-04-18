@@ -1,1 +1,80 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Üdvözöllek az Oldalamon!</title>
+    <style>
+        /* Modern betűtípus és alapbeállítások */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
 
+        /* Üdvözlő kártya stílusa */
+        .welcome-card {
+            background-color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2d3436;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #636e72;
+            margin-bottom: 2rem;
+        }
+
+        /* Egy egyszerű gomb animációval */
+        .cta-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #0984e3;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #74b9ff;
+            transform: translateY(-2px);
+        }
+
+        /* Reszponzivitás kisebb kijelzőkre */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .welcome-card {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="welcome-card">
+        <h1>Üdvözöllek!</h1>
+        <p>Örülök, hogy benéztél hozzám. Ez egy letisztult alap, amit kedvedre formálhatsz tovább. Remélem, tetszik az elrendezés!</p>
+        <a href="#" class="cta-button">Tudj meg többet</a>
+    </div>
+
+</body>
+</html>

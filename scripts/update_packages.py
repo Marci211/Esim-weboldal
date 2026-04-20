@@ -17,12 +17,12 @@ try:
         result = json.loads(response.read().decode())
 
         # Ensure public directory exists
-        os.makedirs("public", exist_ok=True)
 
-        with open("public/packages.json", "w", encoding="utf-8") as f:
+
+        with open("packages.json", "w", encoding="utf-8") as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
-        print("Successfully updated public/packages.json")
+        print("Successfully updated packages.json")
 except Exception as e:
     print(f"Error fetching packages: {e}")
     exit(1)

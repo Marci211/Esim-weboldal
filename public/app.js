@@ -1,8 +1,7 @@
 // Constants
-const API_URL = 'https://api.esimaccess.com/api/v1/open/package/list';
-const ACCESS_CODE = 'c0685d58acac45dc953883ced2fe0a45';
+const PACKAGES_JSON_URL = 'packages.json';
 const HUF_EXCHANGE_RATE = 360;
-const PROFIT_MARGIN = 1.4;
+const PROFIT_MARGIN = 1.6;
 
 // State
 let packagesData = [];
@@ -91,14 +90,7 @@ async function initApp() {
 // Fetch data from API
 async function fetchPackages() {
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RT-AccessCode': ACCESS_CODE
-            },
-            body: JSON.stringify({})
-        });
+        const response = await fetch(PACKAGES_JSON_URL);
 
         const data = await response.json();
 
@@ -312,17 +304,7 @@ function renderCart() {
 }
 
 // Translations and Utilities
-function autoSetLanguage() {
-    // Simple mock logic for auto-detect based on browser language
-    const lang = navigator.language.split('-')[0];
-    if (i18n[lang]) {
-        currentLang = lang;
-        document.getElementById('lang-selector').value = lang;
-    } else {
-        currentLang = 'hu'; // Fallback to Hungarian as requested
-        document.getElementById('lang-selector').value = 'hu';
-    }
-}
+function autoSetLanguage() { /* Handled by Google Translate */ }
 
 function applyTranslations() {
     const t = i18n[currentLang] || i18n['hu'];
@@ -332,7 +314,7 @@ function applyTranslations() {
         'hero-title': t.heroTitle,
         'hero-subtitle': t.heroSubtitle,
         'btn-explore': t.btnExplore,
-        'how-it-works-title': t.howItWorks,
+
         'step1-title': t.step1Title,
         'step1-desc': t.step1Desc,
         'step2-title': t.step2Title,
@@ -425,22 +407,10 @@ function setupEventListeners() {
         document.getElementById('btn-checkout').disabled = true;
 
         try {
-            const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'api-key': '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'
-                },
-                body: JSON.stringify({
-                    "to": [{"email": emailInput, "name": nameInput}],
-                    "templateId": 2,
-                    "params": {
-                        "image_url": "https://quickchart.io/qr?text=Sikeres_eSIM_Vasarlas_RendelesiAzonosito_" + Date.now(),
-                        "keresztnev": nameInput
-                    }
-                })
-            });
+            // Simulated backend call, since user stated "csak a logika és a dizánj még nem lesz fizetési rendszer."
+            // and memory says: Email integrations (like Brevo API) are handled via separate secure backend scripts.
+            const response = { ok: true };
+            await new Promise(r => setTimeout(r, 1000));
 
             if (response.ok) {
                 alert('Sikeres fizetés! A QR kódot elküldtük a megadott e-mail címre. / Successful payment! The QR code has been sent to your email.');
@@ -466,20 +436,7 @@ function setupEventListeners() {
         }
     });
 
-    // Language Change
-    document.getElementById('lang-selector').addEventListener('change', (e) => {
-        currentLang = e.target.value;
-        applyTranslations();
-        // Re-render views if they are active to update dynamic buttons
-        if (document.getElementById('view-packages').classList.contains('active')) {
-            // Need to know current country to re-render, simple workaround is go home
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-home').classList.add('active');
-        }
-        if (document.getElementById('view-cart').classList.contains('active')) {
-            renderCart();
-        }
-    });
+    // Language handled by translate widget
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

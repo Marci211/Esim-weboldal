@@ -19,15 +19,16 @@
                     <span class="font-bold text-xl tracking-tight text-blue-800">Global<span class="text-gray-800">eSIM</span></span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <!-- Language Selector -->
-                    <select id="lang-selector" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-gray-50 p-2">
-                        <option value="hu">Magyar</option>
-                        <option value="en">English</option>
-                        <option value="de">Deutsch</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="it">Italiano</option>
-                    </select>
+                    <!-- Google Translate -->
+                    <div id="google_translate_element" class="mr-4"></div>
+                    <script type="text/javascript">
+                        function googleTranslateElementInit() {
+                            new google.translate.TranslateElement({pageLanguage: 'hu', includedLanguages: 'hu,en,de,fr,es,it,ro,sk,cs,pl,hr,sl,sr', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+                        }
+                    </script>
+                    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+                    <!-- Guide Link -->
+                    <a href="#how-it-works-title" class="text-gray-600 hover:text-blue-600 font-medium mr-4">Útmutató</a>
                     <!-- Cart Icon -->
                     <button id="cart-btn" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
                         <i class="fa-solid fa-cart-shopping text-xl"></i>
@@ -61,30 +62,14 @@
             </div>
 
             <!-- How it works -->
-            <div class="mb-16">
-                <h2 class="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-800" id="how-it-works-title">How it works</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="text-center p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl">
-                            <i class="fa-solid fa-earth-europe"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2" id="step1-title">1. Choose Destination</h3>
-                        <p class="text-gray-500" id="step1-desc">Select where you are traveling and pick the best data plan.</p>
-                    </div>
-                    <div class="text-center p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl">
-                            <i class="fa-solid fa-qrcode"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2" id="step2-title">2. Scan QR Code</h3>
-                        <p class="text-gray-500" id="step2-desc">Receive your eSIM instantly via email. Scan it to install.</p>
-                    </div>
-                    <div class="text-center p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl">
-                            <i class="fa-solid fa-signal"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2" id="step3-title">3. Get Connected</h3>
-                        <p class="text-gray-500" id="step3-desc">Turn on your eSIM when you arrive and enjoy instant internet.</p>
-                    </div>
+            <div id="guide" class="mb-16 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800" id="guide-title">Hogyan használd az eSIM-et? (Útmutató)</h2>
+                <div class="space-y-6 text-gray-600 text-lg leading-relaxed">
+                    <p><i class="fa-solid fa-check text-green-500 mr-2"></i> <strong>1. Kompatibilitás ellenőrzése:</strong> Győződj meg róla, hogy a telefonod támogatja az eSIM technológiát és kártyafüggetlen. Az újabb iPhone-ok (XR-től felfelé), Samsung Galaxy S20+ és Google Pixel készülékek általában támogatják.</p>
+                    <p><i class="fa-solid fa-check text-green-500 mr-2"></i> <strong>2. Csomag kiválasztása:</strong> Keresd meg a célországot és válaszd ki a számodra megfelelő adatkeretet és időtartamot, majd tedd a kosárba.</p>
+                    <p><i class="fa-solid fa-check text-green-500 mr-2"></i> <strong>3. Fizetés és QR kód:</strong> A fizetés után azonnal kapsz egy e-mailt a QR kóddal.</p>
+                    <p><i class="fa-solid fa-check text-green-500 mr-2"></i> <strong>4. Telepítés:</strong> Menj a Beállítások -> Mobilhálózat -> eSIM hozzáadása menüpontba, és szkenneld be a QR kódot a kameráddal. Fontos, hogy ekkor legyen stabil internetkapcsolatod (pl. WiFi).</p>
+                    <p><i class="fa-solid fa-check text-green-500 mr-2"></i> <strong>5. Aktiválás:</strong> Az eSIM-et csak a célországba érkezéskor kapcsold be! Állítsd be elsődleges adathálózatként és engedélyezd rajta az adatbarangolást (roamingot).</p>
                 </div>
             </div>
 

@@ -2,7 +2,7 @@
 const API_URL = 'https://api.esimaccess.com/api/v1/open/package/list';
 const ACCESS_CODE = 'c0685d58acac45dc953883ced2fe0a45';
 const HUF_EXCHANGE_RATE = 360;
-const PROFIT_MARGIN = 1.4;
+const PROFIT_MARGIN = 1.6;
 
 // State
 let packagesData = [];
@@ -82,9 +82,10 @@ const i18n = {
 // Initialize
 async function initApp() {
     setupEventListeners();
-    updateCartCount();
-    autoSetLanguage();
+    await autoSetLanguage();
     applyTranslations();
+    renderCart();
+    updateCartCount();
     await fetchPackages();
 }
 
@@ -244,7 +245,7 @@ function addToCart(pkg, country, priceHUF) {
         data: dataAmount,
         duration: pkg.duration,
         price: priceHUF
-    });
+    , logo: country.logo});
 
     saveCart();
     updateCartCount();
@@ -312,13 +313,33 @@ function renderCart() {
 }
 
 // Translations and Utilities
-function autoSetLanguage() {
-    // Simple mock logic for auto-detect based on browser language
-    const lang = navigator.language.split('-')[0];
-    if (i18n[lang]) {
-        currentLang = lang;
-        document.getElementById('lang-selector').value = lang;
-    } else {
+async function autoSetLanguage() {
+    try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        const countryCode = data.country_code;
+
+        const langMap = {
+            'HU': 'hu',
+            'GB': 'en', 'US': 'en', 'CA': 'en', 'AU': 'en',
+            'DE': 'de', 'AT': 'de', 'CH': 'de',
+            'FR': 'fr', 'BE': 'fr',
+            'ES': 'es', 'MX': 'es', 'AR': 'es',
+            'IT': 'it'
+        };
+
+        currentLang = langMap[countryCode] || 'en';
+    } catch (e) {
+        console.warn('IP lang detect failed, defaulting to en', e);
+        currentLang = 'en';
+    }
+
+    if (!i18n[currentLang]) {
+        currentLang = 'en';
+    }
+
+    applyTranslations();
+} else {
         currentLang = 'hu'; // Fallback to Hungarian as requested
         document.getElementById('lang-selector').value = 'hu';
     }
@@ -408,7 +429,7 @@ function setupEventListeners() {
 
     document.getElementById('btn-checkout').addEventListener('click', async () => {
         if (cart.length === 0) {
-            alert('A kosarad üres / Your cart is empty!');
+            alert(i18n[currentLang].emptyCart);
             return;
         }
 
@@ -416,7 +437,7 @@ function setupEventListeners() {
         const nameInput = document.getElementById('checkout-name').value;
 
         if (!emailInput || !nameInput) {
-            alert('Kérjük, adja meg a nevét és e-mail címét! / Please provide your name and email!');
+            alert('Please provide your name and email!');
             return;
         }
 
@@ -425,38 +446,44 @@ function setupEventListeners() {
         document.getElementById('btn-checkout').disabled = true;
 
         try {
-            const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'api-key': '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'
-                },
-                body: JSON.stringify({
-                    "to": [{"email": emailInput, "name": nameInput}],
-                    "templateId": 2,
-                    "params": {
-                        "image_url": "https://quickchart.io/qr?text=Sikeres_eSIM_Vasarlas_RendelesiAzonosito_" + Date.now(),
-                        "keresztnev": nameInput
-                    }
-                })
-            });
+            // Process each cart item based on quantity (or daily vs non daily)
+            // Here we send one email per item with quantity logic
+            for (const item of cart) {
+                const response = await fetch('/api/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "to": [{"email": emailInput, "name": nameInput}],
+                        "templateId": 2,
+                        "params": {
+                            "keresztnev": nameInput,
+                            "logo_url": item.logo || "https://img.icons8.com/color/80/000000/globe--v1.png",
+                            "orszag_nev": item.countryName,
+                            "adatmennyiseg": item.data,
+                            "ervenyesseg": item.duration + " Nap",
+                            "menniyseg": "1 db",
+                            "qr_text": "LPA:1$smdp.plus$TEST-ACTIVATION-CODE-" + Date.now()
+                        }
+                    })
+                });
 
-            if (response.ok) {
-                alert('Sikeres fizetés! A QR kódot elküldtük a megadott e-mail címre. / Successful payment! The QR code has been sent to your email.');
-                cart = [];
-                saveCart();
-                updateCartCount();
-                renderCart();
-                document.getElementById('checkout-email').value = '';
-                document.getElementById('checkout-name').value = '';
-                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-                document.getElementById('view-home').classList.add('active');
-            } else {
-                const errData = await response.json();
-                console.error(errData);
-                alert('Hiba történt az e-mail küldésekor. Kérjük, ellenőrizze az adatokat. / Error sending email.');
+                if (!response.ok) {
+                    console.error("Failed to send email for", item.countryName);
+                }
+
+                // wait 500ms between emails as requested
+                await new Promise(r => setTimeout(r, 500));
             }
+
+            alert('Sikeres fizetés! A QR kódot elküldtük a megadott e-mail címre. / Successful payment!');
+            cart = [];
+            saveCart();
+            updateCartCount();
+            renderCart();
+            document.getElementById('checkout-email').value = '';
+            document.getElementById('checkout-name').value = '';
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-home').classList.add('active');
         } catch (error) {
             console.error(error);
             alert('Hálózati hiba történt. / Network error occurred.');
@@ -467,19 +494,7 @@ function setupEventListeners() {
     });
 
     // Language Change
-    document.getElementById('lang-selector').addEventListener('change', (e) => {
-        currentLang = e.target.value;
-        applyTranslations();
-        // Re-render views if they are active to update dynamic buttons
-        if (document.getElementById('view-packages').classList.contains('active')) {
-            // Need to know current country to re-render, simple workaround is go home
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-home').classList.add('active');
-        }
-        if (document.getElementById('view-cart').classList.contains('active')) {
-            renderCart();
-        }
-    });
+
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

@@ -1,8 +1,10 @@
 // Constants
 const API_URL = 'https://api.esimaccess.com/api/v1/open/package/list';
+// TODO: Változtasd meg ezt a saját backend szervered URL-jére, ha Github Pages-re töltöd fel (pl. https://backend-szervered.onrender.com)
+const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://ide-kell-a-backend-url.com';
 const ACCESS_CODE = 'c0685d58acac45dc953883ced2fe0a45';
 const HUF_EXCHANGE_RATE = 360;
-const PROFIT_MARGIN = 1.4;
+const PROFIT_MARGIN = 1.6;
 
 // State
 let packagesData = [];
@@ -80,13 +82,15 @@ const i18n = {
 };
 
 // Initialize
+
 async function initApp() {
     setupEventListeners();
     updateCartCount();
-    autoSetLanguage();
+    await autoSetLanguage();
     applyTranslations();
     await fetchPackages();
 }
+
 
 // Fetch data from API
 async function fetchPackages() {
@@ -174,6 +178,7 @@ function renderCountries(searchTerm = '') {
     });
 }
 
+
 function showPackages(countryCode) {
     const country = countriesMap.get(countryCode);
     if (!country) return;
@@ -187,64 +192,122 @@ function showPackages(countryCode) {
     document.getElementById('pkg-country-flag').src = country.logo;
     document.getElementById('pkg-country-networks').innerText = `${i18n[currentLang].networks} ${country.networks}`;
 
+    // Coverage & Operators Map setup
+    const operatorsContainer = document.getElementById('coverage-map-container');
+    const operatorsList = document.getElementById('operators-list');
+
+    if (country.networks && country.networks.length > 0) {
+        operatorsContainer.classList.remove('hidden');
+        operatorsList.innerHTML = country.networks.split(', ').map(op =>
+            `<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold border border-blue-200">
+                <i class="fa-solid fa-tower-cell mr-1"></i> ${op}
+            </span>`
+        ).join('');
+    } else {
+        operatorsContainer.classList.add('hidden');
+    }
+
     // Render Packages
     const grid = document.getElementById('packages-grid');
     grid.innerHTML = '';
 
-    // Sort by price
-    const sortedPackages = country.packages.sort((a, b) => a.price - b.price);
+    if (country.packages.length === 0) {
+        grid.innerHTML = '<p class="col-span-full text-gray-500">Nincsenek elérhető csomagok ehhez az országhoz.</p>';
+        return;
+    }
 
-    sortedPackages.forEach(pkg => {
+    country.packages.forEach(pkg => {
+        const isDaily = pkg.dataType === 2 || pkg.dataType === 3 || !!pkg.fupPolicy;
+        let dataAmount = '';
+        let fupDesc = '';
+
+        if (pkg.volume >= 1073741824) {
+            dataAmount = `${(pkg.volume / 1073741824).toFixed(0)} GB`;
+        } else if (pkg.volume > 0) {
+            dataAmount = `${(pkg.volume / 1048576).toFixed(0)} MB`;
+        } else {
+            dataAmount = "Korlátlan / Unlimited";
+        }
+
+        if (isDaily && pkg.fupPolicy) {
+            dataAmount = `Napi / Daily ${dataAmount}`;
+            fupDesc = `<div class="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded border border-red-100">
+                <i class="fa-solid fa-circle-info"></i> FUP Limit: Napi keret elérése után a sebesség ${pkg.fupPolicy}-ra korlátozódik.
+            </div>`;
+        } else if (pkg.volume > 100000000000 || pkg.name.toLowerCase().includes('unlimited')) {
+            dataAmount = "Korlátlan / Unlimited";
+            fupDesc = `<div class="mt-2 text-xs text-green-700 bg-green-50 p-2 rounded border border-green-100">
+                <i class="fa-solid fa-infinity"></i> Valódi korlátlan adatforgalom!
+            </div>`;
+        }
+
         const priceHUF = calculatePriceHUF(pkg.price);
-        const dataAmount = pkg.volume >= 1073741824 ? `${(pkg.volume / 1073741824).toFixed(0)} GB` : `${(pkg.volume / 1048576).toFixed(0)} MB`;
 
         const card = document.createElement('div');
-        card.className = 'package-card bg-white rounded-xl shadow-sm p-6 flex flex-col justify-between border-gray-200 border';
+        card.className = 'bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden';
+
+        const badge = isDaily ? `<div class="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-bl-lg">DAILY</div>` : '';
 
         card.innerHTML = `
+            ${badge}
             <div>
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold text-gray-800">${dataAmount}</h3>
-                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">${pkg.duration} ${i18n[currentLang].days}</span>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">${dataAmount}</h3>
+                <div class="flex items-center text-gray-500 mb-4">
+                    <i class="fa-regular fa-clock mr-2"></i> <span>${pkg.duration} ${i18n[currentLang].days}</span>
                 </div>
-                <div class="space-y-2 mb-6">
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fa-solid fa-gauge-high w-5 text-gray-400"></i>
-                        <span>${pkg.speed}</span>
-                    </div>
-                    <div class="flex items-center text-sm text-gray-600">
-                        <i class="fa-solid fa-calendar-days w-5 text-gray-400"></i>
-                        <span>${pkg.unusedValidTime} ${i18n[currentLang].days} ${i18n[currentLang].validity.toLowerCase()}</span>
-                    </div>
-                </div>
+                ${fupDesc}
             </div>
-            <div class="mt-auto">
-                <div class="text-2xl font-extrabold text-gray-900 mb-4">${priceHUF.toLocaleString('hu-HU')} HUF</div>
-                <button class="add-to-cart-btn w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors" data-code="${pkg.packageCode}">
-                    ${i18n[currentLang].addToCart}
+            <div class="mt-6 flex items-end justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 mb-1">Ár / Price</p>
+                    <p class="text-2xl font-bold text-blue-600">${priceHUF.toLocaleString('hu-HU')} HUF</p>
+                </div>
+                <button class="add-to-cart-btn bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors shadow-sm">
+                    <i class="fa-solid fa-cart-plus mr-1"></i> ${i18n[currentLang].addToCart}
                 </button>
             </div>
         `;
 
         const btn = card.querySelector('.add-to-cart-btn');
-        btn.addEventListener('click', () => addToCart(pkg, country, priceHUF));
+        btn.addEventListener('click', () => addToCart(pkg, country, priceHUF, isDaily));
 
         grid.appendChild(card);
     });
 }
 
 // Cart Logic
-function addToCart(pkg, country, priceHUF) {
-    const dataAmount = pkg.volume >= 1073741824 ? `${(pkg.volume / 1073741824).toFixed(0)} GB` : `${(pkg.volume / 1048576).toFixed(0)} MB`;
 
-    cart.push({
-        id: Date.now(),
-        code: pkg.packageCode,
-        countryName: country.name,
-        data: dataAmount,
-        duration: pkg.duration,
-        price: priceHUF
-    });
+function addToCart(pkg, country, priceHUF, isDaily) {
+    let dataAmount = '';
+    if (pkg.volume >= 1073741824) {
+        dataAmount = `${(pkg.volume / 1073741824).toFixed(0)} GB`;
+    } else if (pkg.volume > 0) {
+        dataAmount = `${(pkg.volume / 1048576).toFixed(0)} MB`;
+    } else {
+        dataAmount = "Korlátlan / Unlimited";
+    }
+    if (isDaily && pkg.fupPolicy) {
+        dataAmount = `Napi / Daily ${dataAmount}`;
+    }
+
+    const existingItem = cart.find(i => i.code === pkg.packageCode);
+    if (existingItem && !isDaily) {
+        existingItem.quantity += 1;
+        existingItem.totalPrice += priceHUF;
+    } else {
+        cart.push({
+            id: Date.now(),
+            code: pkg.packageCode,
+            countryName: country.name,
+            logo: country.logo,
+            data: dataAmount,
+            duration: pkg.duration,
+            price: priceHUF,
+            totalPrice: priceHUF,
+            quantity: 1,
+            isDaily: isDaily
+        });
+    }
 
     saveCart();
     updateCartCount();
@@ -272,6 +335,7 @@ function updateCartCount() {
     }
 }
 
+
 function renderCart() {
     const container = document.getElementById('cart-items-container');
     const emptyMsg = document.getElementById('empty-cart-msg');
@@ -289,16 +353,16 @@ function renderCart() {
     let total = 0;
 
     cart.forEach(item => {
-        total += item.price;
+        total += item.totalPrice;
         const div = document.createElement('div');
         div.className = 'p-6 flex justify-between items-center';
         div.innerHTML = `
             <div>
                 <h4 class="text-lg font-bold text-gray-800">${item.countryName} - ${item.data}</h4>
-                <p class="text-sm text-gray-500">${item.duration} ${i18n[currentLang].days} validity</p>
+                <p class="text-sm text-gray-500">${item.duration} ${i18n[currentLang].days} validity ${item.quantity > 1 ? `| ${item.quantity} db` : ''}</p>
             </div>
             <div class="flex items-center space-x-6">
-                <span class="font-bold text-gray-900">${item.price.toLocaleString('hu-HU')} HUF</span>
+                <span class="font-bold text-gray-900">${item.totalPrice.toLocaleString('hu-HU')} HUF</span>
                 <button class="text-red-500 hover:text-red-700" onclick="removeFromCart(${item.id})">
                     <i class="fa-solid fa-trash"></i>
                 </button>
@@ -312,18 +376,26 @@ function renderCart() {
 }
 
 // Translations and Utilities
-function autoSetLanguage() {
-    // Simple mock logic for auto-detect based on browser language
-    const lang = navigator.language.split('-')[0];
-    if (i18n[lang]) {
-        currentLang = lang;
-        document.getElementById('lang-selector').value = lang;
-    } else {
-        currentLang = 'hu'; // Fallback to Hungarian as requested
-        document.getElementById('lang-selector').value = 'hu';
+
+async function autoSetLanguage() {
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/config`);
+        if (response.ok) {
+            const data = await response.json();
+            const lang = data.lang;
+            if (i18n[lang]) {
+                currentLang = lang;
+            } else {
+                currentLang = 'hu'; // Fallback
+            }
+        } else {
+            currentLang = 'hu';
+        }
+    } catch (e) {
+        console.error("Language detection failed", e);
+        currentLang = 'hu';
     }
 }
-
 function applyTranslations() {
     const t = i18n[currentLang] || i18n['hu'];
 
@@ -406,6 +478,7 @@ function setupEventListeners() {
         document.getElementById('view-home').classList.add('active');
     });
 
+
     document.getElementById('btn-checkout').addEventListener('click', async () => {
         if (cart.length === 0) {
             alert('A kosarad üres / Your cart is empty!');
@@ -425,21 +498,27 @@ function setupEventListeners() {
         document.getElementById('btn-checkout').disabled = true;
 
         try {
-            const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            const payload = {
+                email: emailInput,
+                name: nameInput,
+                items: cart.map(item => ({
+                    countryName: item.countryName,
+                    data: item.data,
+                    duration: item.duration,
+                    logo: item.logo,
+                    isDaily: item.isDaily,
+                    quantity: item.quantity,
+                    qr_text: `LPA:1$smdp.plus$TEST-ACTIVATION-CODE-${Date.now()}-${item.id}`
+                }))
+            };
+
+            const response = await fetch(`${BACKEND_URL}/api/email`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'api-key': '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'
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    "to": [{"email": emailInput, "name": nameInput}],
-                    "templateId": 2,
-                    "params": {
-                        "image_url": "https://quickchart.io/qr?text=Sikeres_eSIM_Vasarlas_RendelesiAzonosito_" + Date.now(),
-                        "keresztnev": nameInput
-                    }
-                })
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {
@@ -454,7 +533,7 @@ function setupEventListeners() {
                 document.getElementById('view-home').classList.add('active');
             } else {
                 const errData = await response.json();
-                console.error(errData);
+                console.error("Checkout Error:", errData);
                 alert('Hiba történt az e-mail küldésekor. Kérjük, ellenőrizze az adatokat. / Error sending email.');
             }
         } catch (error) {
@@ -466,20 +545,9 @@ function setupEventListeners() {
         }
     });
 
-    // Language Change
-    document.getElementById('lang-selector').addEventListener('change', (e) => {
-        currentLang = e.target.value;
-        applyTranslations();
-        // Re-render views if they are active to update dynamic buttons
-        if (document.getElementById('view-packages').classList.contains('active')) {
-            // Need to know current country to re-render, simple workaround is go home
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-home').classList.add('active');
-        }
-        if (document.getElementById('view-cart').classList.contains('active')) {
-            renderCart();
-        }
-    });
+    // We don't have lang-selector anymore, so no need for that event listener, but let's replace the whole checkout block.
+
+
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

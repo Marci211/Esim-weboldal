@@ -1,8 +1,8 @@
 // Constants
-const API_URL = 'https://api.esimaccess.com/api/v1/open/package/list';
-const ACCESS_CODE = 'c0685d58acac45dc953883ced2fe0a45';
+const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://your-backend-url.com') + '/api/v1/open/package/list';
+const ACCESS_CODE = ''; // Proxied
 const HUF_EXCHANGE_RATE = 360;
-const PROFIT_MARGIN = 1.4;
+const PROFIT_MARGIN = 1.6;
 
 // State
 let packagesData = [];
@@ -75,7 +75,136 @@ const i18n = {
         'checkoutNote': 'This is a demonstration. No real payments are processed.',
         'footerDesc': 'The smartest way to stay connected globally.',
         'itemAdded': 'Item added to cart!'
-    }
+    },
+    'de': {
+        "heroTitle": "Bleiben Sie weltweit in Verbindung",
+        "heroSubtitle": "Sofortige eSIM-Zustellung. Keine Roaming-Gebühren. Wählen Sie aus über 150 Reisezielen.",
+        "btnExplore": "Reiseziele erkunden",
+        "howItWorks": "Wie es funktioniert",
+        "step1Title": "1. Ziel wählen",
+        "step1Desc": "Wählen Sie Ihr Reiseziel und den besten Datentarif.",
+        "step2Title": "2. QR-Code scannen",
+        "step2Desc": "Erhalten Sie Ihre eSIM sofort per E-Mail. Scannen zum Installieren.",
+        "step3Title": "3. Verbinden",
+        "step3Desc": "Schalten Sie Ihre eSIM bei der Ankunft ein und genießen Sie das Internet.",
+        "destTitle": "Beliebte Reiseziele",
+        "searchPlaceholder": "Land suchen...",
+        "backToDest": "Zurück zu den Zielen",
+        "networks": "Verfügbare Netzwerke:",
+        "data": "Daten",
+        "validity": "Gültigkeit",
+        "days": "Tage",
+        "speed": "Geschwindigkeit",
+        "addToCart": "In den Warenkorb",
+        "cartTitle": "Ihr Warenkorb",
+        "continueShopping": "Weiter einkaufen",
+        "emptyCart": "Ihr Warenkorb ist leer.",
+        "orderSummary": "Bestellübersicht",
+        "subtotal": "Zwischensumme",
+        "tax": "Steuer (0%)",
+        "total": "Gesamt",
+        "checkout": "Sichere Kasse",
+        "checkoutNote": "Dies ist eine Demo. Es werden keine echten Zahlungen verarbeitet.",
+        "footerDesc": "Der intelligenteste Weg, weltweit verbunden zu bleiben.",
+        "itemAdded": "Artikel hinzugefügt!"
+},
+    'fr': {
+        "heroTitle": "Restez connecté dans le monde entier",
+        "heroSubtitle": "Livraison eSIM instantanée. Pas de frais d'itinérance. Choisissez parmi plus de 150 destinations.",
+        "btnExplore": "Explorer les destinations",
+        "howItWorks": "Comment ça marche",
+        "step1Title": "1. Choisir la destination",
+        "step1Desc": "Sélectionnez votre destination et le meilleur forfait de données.",
+        "step2Title": "2. Scanner le code QR",
+        "step2Desc": "Recevez votre eSIM instantanément par e-mail. Scannez pour installer.",
+        "step3Title": "3. Se connecter",
+        "step3Desc": "Activez votre eSIM à l'arrivée et profitez d'internet.",
+        "destTitle": "Destinations populaires",
+        "searchPlaceholder": "Rechercher un pays...",
+        "backToDest": "Retour aux destinations",
+        "networks": "Réseaux disponibles:",
+        "data": "Données",
+        "validity": "Validité",
+        "days": "Jours",
+        "speed": "Vitesse",
+        "addToCart": "Ajouter au panier",
+        "cartTitle": "Votre panier",
+        "continueShopping": "Continuer vos achats",
+        "emptyCart": "Votre panier est vide.",
+        "orderSummary": "Résumé de la commande",
+        "subtotal": "Sous-total",
+        "tax": "Taxes (0%)",
+        "total": "Total",
+        "checkout": "Paiement sécurisé",
+        "checkoutNote": "Ceci est une démo. Aucun paiement réel n'est traité.",
+        "footerDesc": "La façon la plus intelligente de rester connecté.",
+        "itemAdded": "Article ajouté!"
+},
+    'es': {
+        "heroTitle": "Mantente conectado en todo el mundo",
+        "heroSubtitle": "Entrega instantánea de eSIM. Sin cargos por roaming. Elige entre más de 150 destinos.",
+        "btnExplore": "Explorar destinos",
+        "howItWorks": "Cómo funciona",
+        "step1Title": "1. Elegir destino",
+        "step1Desc": "Selecciona a dónde viajas y elige el mejor plan de datos.",
+        "step2Title": "2. Escanear código QR",
+        "step2Desc": "Recibe tu eSIM al instante por correo electrónico. Escanea para instalar.",
+        "step3Title": "3. Conectarse",
+        "step3Desc": "Enciende tu eSIM cuando llegues y disfruta de internet.",
+        "destTitle": "Destinos populares",
+        "searchPlaceholder": "Buscar país...",
+        "backToDest": "Volver a destinos",
+        "networks": "Redes disponibles:",
+        "data": "Datos",
+        "validity": "Validez",
+        "days": "Días",
+        "speed": "Velocidad",
+        "addToCart": "Añadir al carrito",
+        "cartTitle": "Tu carrito",
+        "continueShopping": "Seguir comprando",
+        "emptyCart": "Tu carrito está vacío.",
+        "orderSummary": "Resumen del pedido",
+        "subtotal": "Subtotal",
+        "tax": "Impuestos (0%)",
+        "total": "Total",
+        "checkout": "Pago seguro",
+        "checkoutNote": "Esto es una demostración. No se procesan pagos reales.",
+        "footerDesc": "La forma más inteligente de estar conectado.",
+        "itemAdded": "Artículo añadido!"
+},
+    'it': {
+        "heroTitle": "Resta connesso in tutto il mondo",
+        "heroSubtitle": "Consegna istantanea della eSIM. Nessun costo di roaming. Scegli tra oltre 150 destinazioni.",
+        "btnExplore": "Esplora destinazioni",
+        "howItWorks": "Come funziona",
+        "step1Title": "1. Scegli la destinazione",
+        "step1Desc": "Seleziona dove viaggi e scegli il miglior piano dati.",
+        "step2Title": "2. Scansiona il codice QR",
+        "step2Desc": "Ricevi la tua eSIM istantaneamente via email. Scansiona per installare.",
+        "step3Title": "3. Connettiti",
+        "step3Desc": "Accendi la tua eSIM all'arrivo e goditi internet.",
+        "destTitle": "Destinazioni popolari",
+        "searchPlaceholder": "Cerca paese...",
+        "backToDest": "Torna alle destinazioni",
+        "networks": "Reti disponibili:",
+        "data": "Dati",
+        "validity": "Validità",
+        "days": "Giorni",
+        "speed": "Velocità",
+        "addToCart": "Aggiungi al carrello",
+        "cartTitle": "Il tuo carrello",
+        "continueShopping": "Continua lo shopping",
+        "emptyCart": "Il tuo carrello è vuoto.",
+        "orderSummary": "Riepilogo ordine",
+        "subtotal": "Subtotale",
+        "tax": "Tasse (0%)",
+        "total": "Totale",
+        "checkout": "Pagamento sicuro",
+        "checkoutNote": "Questa è una dimostrazione. Nessun pagamento reale viene elaborato.",
+        "footerDesc": "Il modo più intelligente per restare connessi.",
+        "itemAdded": "Articolo aggiunto!"
+}
+
     // Other languages can be added similarly
 };
 
@@ -162,6 +291,11 @@ function renderCountries(searchTerm = '') {
     countriesMap.forEach((country, code) => {
         if (term && !country.name.toLowerCase().includes(term)) return;
 
+        let descHtml = '';
+        if (pkg.fupPolicy) {
+            descHtml += `<p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-circle-info"></i> ${pkg.fupPolicy}</p>`;
+        }
+
         const card = document.createElement('div');
         card.className = 'country-card bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-pointer flex items-center';
         card.innerHTML = `
@@ -185,7 +319,13 @@ function showPackages(countryCode) {
     // Update Header
     document.getElementById('pkg-country-name').innerText = country.name;
     document.getElementById('pkg-country-flag').src = country.logo;
-    document.getElementById('pkg-country-networks').innerText = `${i18n[currentLang].networks} ${country.networks}`;
+    let networkHtml = '';
+    if (country.packages.length > 0 && country.packages[0].locationNetworkList && country.packages[0].locationNetworkList[0].operatorList) {
+        networkHtml = country.packages[0].locationNetworkList[0].operatorList.map(op => `<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">${op.operatorName} (${op.networkType.join('/')})</span>`).join(' ');
+    } else {
+        networkHtml = `<span class="text-gray-600">${country.networks}</span>`;
+    }
+    document.getElementById('pkg-country-networks').innerHTML = `${i18n[currentLang].networks} <br> ${networkHtml}`;
 
     // Render Packages
     const grid = document.getElementById('packages-grid');
@@ -425,20 +565,29 @@ function setupEventListeners() {
         document.getElementById('btn-checkout').disabled = true;
 
         try {
-            const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            const orderItems = cart.map(item => ({
+                countryName: item.countryName,
+                data: item.data,
+                duration: item.duration,
+                durationUnit: 'DAY',
+                dataType: 2,
+                quantity: 1,
+                logo: item.logo || 'https://img.icons8.com/color/80/000000/globe--v1.png'
+            }));
+
+            // Use the proxy endpoint. On Github Pages, this needs to point to where the backend is hosted.
+            const backendUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : 'https://your-backend-url.com';
+
+            const response = await fetch(backendUrl + '/api/email', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'api-key': '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'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    "to": [{"email": emailInput, "name": nameInput}],
-                    "templateId": 2,
-                    "params": {
-                        "image_url": "https://quickchart.io/qr?text=Sikeres_eSIM_Vasarlas_RendelesiAzonosito_" + Date.now(),
-                        "keresztnev": nameInput
-                    }
+                    orderItems,
+                    customerEmail: emailInput,
+                    customerName: nameInput
                 })
             });
 
